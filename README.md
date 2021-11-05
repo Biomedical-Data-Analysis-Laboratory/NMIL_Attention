@@ -10,7 +10,7 @@ Multiple instance learning (MIL) is a type of weakly supervised learning where m
 </p>
 
 <p align="center">
-    <img src="vertical_model.png">
+    <img src="images/vertical_model.png">
 </p>
 
 ### 2 - How to use
