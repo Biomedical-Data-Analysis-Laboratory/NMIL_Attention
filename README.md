@@ -5,9 +5,13 @@ This is the source code described in the paper "Nested Multiple Instance Learnin
 ### 1 - Abstract
 Multiple instance learning (MIL) is a type of weakly supervised learning where multiple instances of data with unknown labels are sorted into bags. Since knowledge about the individual instances is incomplete, labels are assigned to the bags containing the instances. While this method fits diverse applications were labelled data is scarce, it lacks depth for solving more complex scenarios where associations between sets of instances have to be made, like finding relevant regions of interest in an image or detecting events in a set of time-series signals. Nested MIL considers labelled bags within bags, where only the outermost bag is labelled and inner-bags and instances are represented as latent labels. In addition, we propose using an attention mechanism to add interpretability, providing awareness into the impact of each instance to the weak bag label. Experiments in classical image datasets show that our proposed model provides high accuracy performance as well as spotting relevant instances on image regions.
 
-<div style="text-align:center"><img src="images/nested_concept.png" /></div>
+<p align="center">
+    <img src="images/nested_concept.png">
+</p>
 
-<div style="text-align:center"><img src="vertical_model.png" /></div>
+<p align="center">
+    <img src="vertical_model.png">
+</p>
 
 ### 2 - How to use
 
