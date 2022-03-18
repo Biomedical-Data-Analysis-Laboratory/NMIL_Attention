@@ -129,12 +129,10 @@ if __name__ == '__main__':
     # Generate bags and save them in dictionaries
     train_data, train_labels, train_bag = my_functions.generate_set(trainX, trainY, EXPERIMENT_ID, N_POS_TRAIN_BAGS, N_NEG_TRAIN_BAGS, len_of_array, BAG_SIZE, N_INS_FIRST_LEVEL, N_INS_SECOND_LEVEL, N_INS_THIRD_LEVEL, pos_ind_training, neg_ind_training, WITNESS_RATIO, pos_digit)
       
-    # PCAM does have a validation set
-    if DATASET_TO_USE == 'PCAM': 
-        ### DEFINE VALIDATION SET ###
-            
-        # Generate bags and save them in dictionaries
-        val_data, val_labels, val_bag = my_functions.generate_set(valX, valY, EXPERIMENT_ID, N_POS_VAL_BAGS, N_NEG_VAL_BAGS, len_of_array, BAG_SIZE, N_INS_FIRST_LEVEL, N_INS_SECOND_LEVEL, N_INS_THIRD_LEVEL, pos_ind_val, neg_ind_val, WITNESS_RATIO, pos_digit)
+    ### DEFINE VALIDATION SET ###
+
+    # Generate bags and save them in dictionaries
+    val_data, val_labels, val_bag = my_functions.generate_set(valX, valY, EXPERIMENT_ID, N_POS_VAL_BAGS, N_NEG_VAL_BAGS, len_of_array, BAG_SIZE, N_INS_FIRST_LEVEL, N_INS_SECOND_LEVEL, N_INS_THIRD_LEVEL, pos_ind_val, neg_ind_val, WITNESS_RATIO, pos_digit)
             
     
     ### DEFINE TEST SET ###
