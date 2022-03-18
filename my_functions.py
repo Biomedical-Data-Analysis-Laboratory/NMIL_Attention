@@ -96,6 +96,60 @@ def load_PCAM():
 
 
 ##############################################################################
+"""GENERATE SET OF DATA"""
+##############################################################################
+def generate_set(X, Y, EXPERIMENT_ID, N_POS_BAGS, N_NEG_BAGS, len_of_array, BAG_SIZE, N_INS_FIRST_LEVEL, N_INS_SECOND_LEVEL, N_INS_THIRD_LEVEL, POS_INDEXES, NEG_INDEXES, WITNESS_RATIO, pos_digit):
+    # Generate bags and save them in dictionaries
+    data = dict()
+    labels = dict()
+    bag_label = dict()
+    index = 0
+    
+    # Keep generating bags until the number of positive and negative bags is met        
+    while(N_POS_BAGS > 0 or N_NEG_BAGS > 0):
+        
+        # Initialize array of images
+        array_of_imgs = np.zeros((len_of_array, X[0].shape[0], X[0].shape[1], X[0].shape[2]))
+    
+        # Generate bag label info
+        if EXPERIMENT_ID == 1:
+            final_label, randomlist, extracted_labels = generate_exp_1_bag_label_info(Y, BAG_SIZE, N_INS_FIRST_LEVEL, N_INS_SECOND_LEVEL, POS_INDEXES, NEG_INDEXES, WITNESS_RATIO, pos_digit, N_POS_BAGS)
+        elif EXPERIMENT_ID == 2:
+            final_label, randomlist, extracted_labels = generate_exp_2_bag_label_info(Y, BAG_SIZE, N_INS_FIRST_LEVEL, N_INS_SECOND_LEVEL, POS_INDEXES, NEG_INDEXES, WITNESS_RATIO, pos_digit)
+        elif EXPERIMENT_ID == 3:
+            final_label, randomlist, extracted_labels = MNIST_generate_exp_3_bag_label_info(Y, BAG_SIZE, N_INS_FIRST_LEVEL, N_INS_SECOND_LEVEL, N_INS_THIRD_LEVEL, POS_INDEXES, NEG_INDEXES, WITNESS_RATIO)
+        
+        # Update current generation status
+        # If the bag is positive and the number of positives is not met
+        if final_label and N_POS_BAGS > 0:
+            # Save data in dictionary
+            for count, img_index in enumerate(randomlist):
+                array_of_imgs[count] = X[img_index]
+            data[index] = array_of_imgs
+            labels[index] = extracted_labels
+            bag_label[index] = final_label
+            
+            # Update indexes
+            N_POS_BAGS -= 1
+            index += 1 
+        
+        # If the bag is negative and the number of negatives is not met
+        elif not final_label and N_NEG_BAGS > 0:
+            # Save data in dictionary
+            for count, img_index in enumerate(randomlist):
+                array_of_imgs[count] = X[img_index]
+            data[index] = array_of_imgs
+            labels[index] = extracted_labels
+            bag_label[index] = final_label
+            
+            # Update indexes
+            N_NEG_BAGS -= 1
+            index += 1 
+                
+        return data, labels, bag_label
+
+    
+##############################################################################
 """RANDOM SAMPLE SELECTION"""
 ##############################################################################
 def random_sample_selection(pos_ind_training, neg_ind_training, number_of_samples, WITNESS_RATIO):
@@ -219,7 +273,99 @@ def generate_exp_1_bag_label_info(Y, BAG_SIZE, N_INS_FIRST_LEVEL, N_INS_SECOND_L
     
     return second_layer_labels, randomlist, extracted_labels
         
+    
+##############################################################################
+"""OBTAIN GENERATORS AND MODEL"""
+##############################################################################
+def obtain_generators_model(train_data, train_bag, val_data, val_bag, test_data, test_bag, EXPERIMENT_ID, NESTED_MODEL, ATTENTION_MODEL, DATASET_TO_USE, BAG_SIZE,
+                            CLASSIFIER_UNITS, CONV1_FILTERS, CONV2_FILTERS, KERNEL_SIZE, POOLING_SIZE, CLASSIFIER_UNITS, DROPOUT, ATTENTION_UNITS):
+    # Define generators and models
+    if EXPERIMENT_ID in [1, 2] and NESTED_MODEL == False:
+        train_generator = generator_1_level(images=train_data,
+                                            bag=train_bag,
+                                            shuffle=True)
+        
+        test_generator = generator_1_level(images=test_data,
+                                            bag=test_bag,
+                                            shuffle=False)
+        
+        # Define model
+        if DATASET_TO_USE == 'MNIST':
+            val_generator = generator_1_level(images=test_data,
+                                            bag=test_bag,
+                                            shuffle=True)
+            
+            if ATTENTION_MODEL:
+                classifier_model = MNIST_Model_1_levels_w_Att(CONV1_FILTERS, CONV2_FILTERS, KERNEL_SIZE, POOLING_SIZE, CLASSIFIER_UNITS, DROPOUT, ATTENTION_UNITS)
+            else:
+                classifier_model = MNIST_Model_1_levels_wo_Att(CONV1_FILTERS, CONV2_FILTERS, KERNEL_SIZE, POOLING_SIZE, CLASSIFIER_UNITS, DROPOUT)
+                
+        elif DATASET_TO_USE == 'PCAM':
+            val_generator = generator_1_level(images=val_data,
+                                            bag=val_bag,
+                                            shuffle=True)
+            if ATTENTION_MODEL:
+                classifier_model = PCAM_Model_1_levels_w_Att(CLASSIFIER_UNITS, DROPOUT, ATTENTION_UNITS)
+            else:
+                classifier_model = PCAM_Model_1_levels_wo_Att(CLASSIFIER_UNITS, DROPOUT)
+        
+    elif EXPERIMENT_ID in [1, 2] and NESTED_MODEL == True:
+        train_generator = generator_2_levels(images=train_data,
+                                            bag=train_bag,
+                                            bag_size=BAG_SIZE,
+                                            shuffle=True)
+        
+        test_generator = generator_2_levels(images=test_data,
+                                            bag=test_bag,
+                                            bag_size=BAG_SIZE,
+                                            shuffle=False)
+                                                
+        # Define model
+        if DATASET_TO_USE == 'MNIST':
+            val_generator = generator_2_levels(images=test_data,
+                                            bag=test_bag,
+                                            bag_size=BAG_SIZE,
+                                            shuffle=True)
+            
+            if ATTENTION_MODEL:
+                classifier_model = MNIST_Model_2_levels_w_Att(CONV1_FILTERS, CONV2_FILTERS, KERNEL_SIZE, POOLING_SIZE, CLASSIFIER_UNITS, DROPOUT, ATTENTION_UNITS)
+            else:
+                classifier_model = MNIST_Model_2_levels_wo_Att(CONV1_FILTERS, CONV2_FILTERS, KERNEL_SIZE, POOLING_SIZE, CLASSIFIER_UNITS, DROPOUT)
+                
+        elif DATASET_TO_USE == 'PCAM':
+            val_generator = generator_2_levels(images=val_data,
+                                            bag=val_bag,
+                                            bag_size=BAG_SIZE,
+                                            shuffle=True)
+            if ATTENTION_MODEL:
+                classifier_model = PCAM_Model_2_levels_w_Att(CLASSIFIER_UNITS, DROPOUT, ATTENTION_UNITS)
+            else:
+                classifier_model = PCAM_Model_2_levels_wo_Att(CLASSIFIER_UNITS, DROPOUT)
+        
+    elif EXPERIMENT_ID == 3:
+        train_generator = generator_3_levels(images=train_data,
+                                            bag=train_bag,
+                                            bag_size=BAG_SIZE,
+                                            shuffle=True)
+        
+        test_generator = generator_3_levels(images=test_data,
+                                            bag=test_bag,
+                                            bag_size=BAG_SIZE,
+                                            shuffle=False)
+        
+        val_generator = generator_3_levels(images=test_data,
+                                            bag=test_bag,
+                                            bag_size=BAG_SIZE,
+                                            shuffle=True)
+        # Define model                                        
+        if ATTENTION_MODEL:
+            classifier_model = MNIST_Model_3_levels_w_Att(CONV1_FILTERS, CONV2_FILTERS, KERNEL_SIZE, POOLING_SIZE, CLASSIFIER_UNITS, DROPOUT, ATTENTION_UNITS)
+        else:
+            classifier_model = MNIST_Model_3_levels_wo_Att(CONV1_FILTERS, CONV2_FILTERS, KERNEL_SIZE, POOLING_SIZE, CLASSIFIER_UNITS, DROPOUT)
+    
+    return classifier_model, train_generator, val_generator, test_generator
 
+    
 ##############################################################################
 """MNIST MODEL FOR 1 LEVELS EXPERIMENT WITH ATTENTION"""
 ##############################################################################
@@ -908,7 +1054,6 @@ class generator_1_level(keras.utils.Sequence):
 
     def __init__(self, images, bag, shuffle):
         """Initialization.
-
         Args:
             images: A list of bags of images.
             bag: A list of bag-of-bags labels.
@@ -957,7 +1102,6 @@ class generator_2_levels(keras.utils.Sequence):
 
     def __init__(self, images, bag, bag_size, shuffle):
         """Initialization.
-
         Args:
             images: A list of bags of images.
             bag: A list of bag-of-bags labels.
@@ -1016,7 +1160,6 @@ class generator_3_levels(keras.utils.Sequence):
 
     def __init__(self, images, bag, bag_size, shuffle):
         """Initialization.
-
         Args:
             images: A list of bags of images.
             bag: A list of bag-of-bags labels.
