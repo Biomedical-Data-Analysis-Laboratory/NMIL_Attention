@@ -127,224 +127,24 @@ if __name__ == '__main__':
     ### DEFINE TRAINING SET ###
     
     # Generate bags and save them in dictionaries
-    train_data = dict()
-    train_labels = dict()
-    train_bag = dict()
-    indexes = len(trainX)
-    index = 0
-    
-    # Keep generating bags until the number of positive and negative bags is met        
-    while(N_POS_TRAIN_BAGS > 0 or N_NEG_TRAIN_BAGS > 0):
-        
-        # Initialize array of images
-        array_of_imgs = np.zeros((len_of_array, trainX[0].shape[0], trainX[0].shape[1], trainX[0].shape[2]))
-        
-        # Generate bag label info
-        if EXPERIMENT_ID == 1:
-            final_label, randomlist, extracted_labels = my_functions.generate_exp_1_bag_label_info(trainY, BAG_SIZE, N_INS_FIRST_LEVEL, N_INS_SECOND_LEVEL, pos_ind_training, neg_ind_training, WITNESS_RATIO, pos_digit, N_POS_TRAIN_BAGS)
-        elif EXPERIMENT_ID == 2:
-            final_label, randomlist, extracted_labels = my_functions.generate_exp_2_bag_label_info(trainY, BAG_SIZE, N_INS_FIRST_LEVEL, N_INS_SECOND_LEVEL, pos_ind_training, neg_ind_training, WITNESS_RATIO, pos_digit)
-        elif EXPERIMENT_ID == 3:
-            final_label, randomlist, extracted_labels = my_functions.MNIST_generate_exp_3_bag_label_info(trainY, BAG_SIZE, N_INS_FIRST_LEVEL, N_INS_SECOND_LEVEL, N_INS_THIRD_LEVEL, pos_ind_training, neg_ind_training, WITNESS_RATIO)
-        
-        # Update current generation status
-        # If the bag is positive and the number of positives is not met
-        if final_label and N_POS_TRAIN_BAGS > 0:
-            # Save data in dictionary
-            for count, img_index in enumerate(randomlist):
-                array_of_imgs[count] = trainX[img_index]
-            train_data[index] = array_of_imgs
-            train_labels[index] = extracted_labels
-            train_bag[index] = final_label
-            
-            # Update indexes
-            N_POS_TRAIN_BAGS -= 1
-            index += 1 
-        
-        # If the bag is negative and the number of negatives is not met
-        elif not final_label and N_NEG_TRAIN_BAGS > 0:
-            # Save data in dictionary
-            for count, img_index in enumerate(randomlist):
-                array_of_imgs[count] = trainX[img_index]
-            train_data[index] = array_of_imgs
-            train_labels[index] = extracted_labels
-            train_bag[index] = final_label
-            
-            # Update indexes
-            N_NEG_TRAIN_BAGS -= 1
-            index += 1 
+    train_data, train_labels, train_bag = my_functions.generate_set(trainX, trainY, EXPERIMENT_ID, N_POS_TRAIN_BAGS, N_NEG_TRAIN_BAGS, len_of_array, BAG_SIZE, N_INS_FIRST_LEVEL, N_INS_SECOND_LEVEL, N_INS_THIRD_LEVEL, pos_ind_training, neg_ind_training, WITNESS_RATIO, pos_digit)
       
     # PCAM does have a validation set
     if DATASET_TO_USE == 'PCAM': 
         ### DEFINE VALIDATION SET ###
             
         # Generate bags and save them in dictionaries
-        val_data = dict()
-        val_labels = dict()
-        val_bag = dict()
-        indexes = len(valX)
-        index = 0
-           
-        # Keep generating bags until the number of positive and negative bags is met      
-        while(N_POS_VAL_BAGS > 0 or N_NEG_VAL_BAGS > 0):
-            
-            # Initialize array of images
-            array_of_imgs = np.zeros((len_of_array, valX[0].shape[0], valX[0].shape[1], valX[0].shape[2]))
-            
-            # Generate bag label info
-            if EXPERIMENT_ID == 1:
-                final_label, randomlist, extracted_labels = my_functions.generate_exp_1_bag_label_info(valY, BAG_SIZE, N_INS_FIRST_LEVEL, N_INS_SECOND_LEVEL, pos_ind_val, neg_ind_val, WITNESS_RATIO, pos_digit, N_POS_VAL_BAGS)
-            elif EXPERIMENT_ID == 2:
-                final_label, randomlist, extracted_labels = my_functions.generate_exp_2_bag_label_info(valY, BAG_SIZE, N_INS_FIRST_LEVEL, N_INS_SECOND_LEVEL, pos_ind_val, neg_ind_val, WITNESS_RATIO, pos_digit)
-            
-            # Update current generation status     
-            # If the bag is positive and the number of positives is not met
-            if final_label and N_POS_VAL_BAGS > 0:
-                # Save data in dictionary
-                for count, img_index in enumerate(randomlist):
-                    array_of_imgs[count] = valX[img_index]
-                val_data[index] = array_of_imgs
-                val_labels[index] = extracted_labels
-                val_bag[index] = final_label
-                
-                # Update indexes
-                N_POS_VAL_BAGS -= 1
-                index += 1 
-                
-            # If the bag is negative and the number of negatives is not met
-            elif not final_label and N_NEG_VAL_BAGS > 0:
-                # Save data in dictionary
-                for count, img_index in enumerate(randomlist):
-                    array_of_imgs[count] = valX[img_index]
-                val_data[index] = array_of_imgs
-                val_bag[index] = extracted_labels
-                val_bag[index] = final_label
-                
-                # Update indexes
-                N_NEG_VAL_BAGS -= 1
-                index += 1 
+        val_data, val_labels, val_bag = my_functions.generate_set(valX, valY, EXPERIMENT_ID, N_POS_VAL_BAGS, N_NEG_VAL_BAGS, len_of_array, BAG_SIZE, N_INS_FIRST_LEVEL, N_INS_SECOND_LEVEL, N_INS_THIRD_LEVEL, pos_ind_val, neg_ind_val, WITNESS_RATIO, pos_digit)
             
     
     ### DEFINE TEST SET ###
         
     # Generate bags and save them in dictionaries
-    test_data = dict()
-    test_labels = dict()
-    test_bag = dict()
-    indexes = len(testX)
-    index = 0
-       
-    # Keep generating bags until the number of positive and negative bags is met      
-    while(N_POS_TEST_BAGS > 0 or N_NEG_TEST_BAGS > 0):
-        
-        # Initialize array of images
-        array_of_imgs = np.zeros((len_of_array, testX[0].shape[0], testX[0].shape[1], testX[0].shape[2]))
-        
-        # Generate bag label info
-        if EXPERIMENT_ID == 1:
-            final_label, randomlist, extracted_labels = my_functions.generate_exp_1_bag_label_info(testY, BAG_SIZE, N_INS_FIRST_LEVEL, N_INS_SECOND_LEVEL, pos_ind_test, neg_ind_test, WITNESS_RATIO, pos_digit, N_POS_TEST_BAGS)
-        elif EXPERIMENT_ID == 2:
-            final_label, randomlist, extracted_labels = my_functions.generate_exp_2_bag_label_info(testY, BAG_SIZE, N_INS_FIRST_LEVEL, N_INS_SECOND_LEVEL, pos_ind_test, neg_ind_test, WITNESS_RATIO, pos_digit)
-        elif EXPERIMENT_ID == 3:
-            final_label, randomlist, extracted_labels = my_functions.MNIST_generate_exp_3_bag_label_info(testY, BAG_SIZE, N_INS_FIRST_LEVEL, N_INS_SECOND_LEVEL, N_INS_THIRD_LEVEL, pos_ind_test, neg_ind_test, WITNESS_RATIO)
-        
-        # Update current generation status     
-        # If the bag is positive and the number of positives is not met
-        if final_label and N_POS_TEST_BAGS > 0:
-            # Save data in dictionary
-            for count, img_index in enumerate(randomlist):
-                array_of_imgs[count] = testX[img_index]
-            test_data[index] = array_of_imgs
-            test_labels[index] = extracted_labels
-            test_bag[index] = final_label
-            
-            # Update indexes
-            N_POS_TEST_BAGS -= 1
-            index += 1 
-            
-        # If the bag is negative and the number of negatives is not met
-        elif not final_label and N_NEG_TEST_BAGS > 0:
-            # Save data in dictionary
-            for count, img_index in enumerate(randomlist):
-                array_of_imgs[count] = testX[img_index]
-            test_data[index] = array_of_imgs
-            test_labels[index] = extracted_labels
-            test_bag[index] = final_label
-            
-            # Update indexes
-            N_NEG_TEST_BAGS -= 1
-            index += 1 
+    test_data, test_labels, test_bag = my_functions.generate_set(testX, testY, EXPERIMENT_ID, N_POS_TEST_BAGS, N_NEG_TEST_BAGS, len_of_array, BAG_SIZE, N_INS_FIRST_LEVEL, N_INS_SECOND_LEVEL, N_INS_THIRD_LEVEL, pos_ind_test, neg_ind_test, WITNESS_RATIO, pos_digit)
         
     # Define generators and models
-    if EXPERIMENT_ID in [1, 2] and NESTED_MODEL == False:
-        train_generator = my_functions.generator_1_level(images=train_data,
-                                                                bag=train_bag,
-                                                                shuffle=True)
-        
-        test_generator = my_functions.generator_1_level(images=test_data,
-                                                                bag=test_bag,
-                                                                shuffle=True)
-        
-        # Define model
-        if DATASET_TO_USE == 'MNIST':
-            if ATTENTION_MODEL:
-                classifier_model = my_functions.MNIST_Model_1_levels_w_Att(CONV1_FILTERS, CONV2_FILTERS, KERNEL_SIZE, POOLING_SIZE, CLASSIFIER_UNITS, DROPOUT, ATTENTION_UNITS)
-            else:
-                classifier_model = my_functions.MNIST_Model_1_levels_wo_Att(CONV1_FILTERS, CONV2_FILTERS, KERNEL_SIZE, POOLING_SIZE, CLASSIFIER_UNITS, DROPOUT)
-                
-        elif DATASET_TO_USE == 'PCAM':
-            val_generator = my_functions.generator_1_level(images=val_data,
-                                                                bag=val_bag,
-                                                                shuffle=True)
-            if ATTENTION_MODEL:
-                print()
-                classifier_model = my_functions.PCAM_Model_1_levels_w_Att(CLASSIFIER_UNITS, DROPOUT, ATTENTION_UNITS)
-            else:
-                classifier_model = my_functions.PCAM_Model_1_levels_wo_Att(CLASSIFIER_UNITS, DROPOUT)
-        
-    elif EXPERIMENT_ID in [1, 2] and NESTED_MODEL == True:
-        train_generator = my_functions.generator_2_levels(images=train_data,
-                                                                bag=train_bag,
-                                                                bag_size=BAG_SIZE,
-                                                                shuffle=True)
-        
-        test_generator = my_functions.generator_2_levels(images=test_data,
-                                                                bag=test_bag,
-                                                                bag_size=BAG_SIZE,
-                                                                shuffle=True)
-                                                
-        # Define model
-        if DATASET_TO_USE == 'MNIST':
-            if ATTENTION_MODEL:
-                classifier_model = my_functions.MNIST_Model_2_levels_w_Att(CONV1_FILTERS, CONV2_FILTERS, KERNEL_SIZE, POOLING_SIZE, CLASSIFIER_UNITS, DROPOUT, ATTENTION_UNITS)
-            else:
-                classifier_model = my_functions.MNIST_Model_2_levels_wo_Att(CONV1_FILTERS, CONV2_FILTERS, KERNEL_SIZE, POOLING_SIZE, CLASSIFIER_UNITS, DROPOUT)
-                
-        elif DATASET_TO_USE == 'PCAM':
-            val_generator = my_functions.generator_2_levels(images=val_data,
-                                                                bag=val_bag,
-                                                                bag_size=BAG_SIZE,
-                                                                shuffle=True)
-            if ATTENTION_MODEL:
-                classifier_model = my_functions.PCAM_Model_2_levels_w_Att(CLASSIFIER_UNITS, DROPOUT, ATTENTION_UNITS)
-            else:
-                classifier_model = my_functions.PCAM_Model_2_levels_wo_Att(CLASSIFIER_UNITS, DROPOUT)
-        
-    elif EXPERIMENT_ID == 3:
-        train_generator = my_functions.generator_3_levels(images=train_data,
-                                                                bag=train_bag,
-                                                                bag_size=BAG_SIZE,
-                                                                shuffle=True)
-        
-        test_generator = my_functions.generator_3_levels(images=test_data,
-                                                                bag=test_bag,
-                                                                bag_size=BAG_SIZE,
-                                                                shuffle=True)
-        # Define model                                        
-        if ATTENTION_MODEL:
-            classifier_model = my_functions.MNIST_Model_3_levels_w_Att(CONV1_FILTERS, CONV2_FILTERS, KERNEL_SIZE, POOLING_SIZE, CLASSIFIER_UNITS, DROPOUT, ATTENTION_UNITS)
-        else:
-            classifier_model = my_functions.MNIST_Model_3_levels_wo_Att(CONV1_FILTERS, CONV2_FILTERS, KERNEL_SIZE, POOLING_SIZE, CLASSIFIER_UNITS, DROPOUT)
+    classifier_model, train_generator, val_generator, test_generator = my_functions.obtain_generators_model(train_data, train_bag, val_data, val_bag, test_data, test_bag, EXPERIMENT_ID, NESTED_MODEL, ATTENTION_MODEL, DATASET_TO_USE, BAG_SIZE,
+                            CLASSIFIER_UNITS, CONV1_FILTERS, CONV2_FILTERS, KERNEL_SIZE, POOLING_SIZE, CLASSIFIER_UNITS, DROPOUT, ATTENTION_UNITS)
             
     # Define callback settings     
     my_reduce_LR_callback = ReduceLROnPlateau(monitor='val_loss',  # quantity to be monitored
@@ -378,16 +178,7 @@ if __name__ == '__main__':
                                         experimental_run_tf_function=False)    
         
     # Train model
-    if DATASET_TO_USE == 'MNIST':
-        classifier_history = classifier_model.fit_generator(generator=train_generator,
-                                                            steps_per_epoch=None,
-                                                            epochs=EPOCHS,
-                                                            verbose=1,  # Verbosity mode. 0 = silent, 1 = progress bar, 2 = one line per epoch.
-                                                            validation_data=test_generator,
-                                                            callbacks=callback_array,
-                                                            shuffle=True)
-    elif DATASET_TO_USE == 'PCAM':
-        classifier_history = classifier_model.fit_generator(generator=train_generator,
+    classifier_history = classifier_model.fit_generator(generator=train_generator,
                                                             steps_per_epoch=None,
                                                             epochs=EPOCHS,
                                                             verbose=1,  # Verbosity mode. 0 = silent, 1 = progress bar, 2 = one line per epoch.
