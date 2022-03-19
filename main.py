@@ -95,7 +95,9 @@ if __name__ == '__main__':
         # Load MNIST dataset
         (trainX, trainY), (testX, testY) = mnist.load_data() # Test set will be used both as validation and test set
         trainX = trainX[..., np.newaxis]
-        testX = testX[..., np.newaxis]   
+        testX = testX[..., np.newaxis]
+        valY = testY.copy()
+        valX = testX.copy()
         pos_digit = MNIST_POS_DIGIT
     elif DATASET_TO_USE == 'PCAM':
         # Load PCAM dataset
@@ -110,9 +112,8 @@ if __name__ == '__main__':
         #For this experiment, digit 9 is the positive instance and all other digits are negatives
         pos_ind_training = list(np.where(trainY == pos_digit)[0])
         neg_ind_training = list(np.where(trainY != pos_digit)[0])
-        if DATASET_TO_USE == 'PCAM':
-            pos_ind_val = list(np.where(valY == pos_digit)[0])
-            neg_ind_val = list(np.where(valY != pos_digit)[0])
+        pos_ind_val = list(np.where(valY == pos_digit)[0])
+        neg_ind_val = list(np.where(valY != pos_digit)[0])
         pos_ind_test = list(np.where(testY == pos_digit)[0])
         neg_ind_test = list(np.where(testY != pos_digit)[0])
         len_of_array = N_INS_SECOND_LEVEL
@@ -133,12 +134,8 @@ if __name__ == '__main__':
 
     # Generate bags and save them in dictionaries
     #GENERATE_VALIDATION_SET
-    if DATASET_TO_USE == 'PCAM':
-        val_data, val_labels, val_bag = my_functions.generate_set(valX, valY, EXPERIMENT_ID, N_POS_VAL_BAGS, N_NEG_VAL_BAGS, len_of_array, BAG_SIZE, N_INS_FIRST_LEVEL, N_INS_SECOND_LEVEL, N_INS_THIRD_LEVEL, pos_ind_val, neg_ind_val, WITNESS_RATIO, pos_digit)
-    else:
-        val_data, val_labels, val_bag = my_functions.generate_set(testX, testY, EXPERIMENT_ID, N_POS_VAL_BAGS, N_NEG_VAL_BAGS, len_of_array, BAG_SIZE, N_INS_FIRST_LEVEL, N_INS_SECOND_LEVEL, N_INS_THIRD_LEVEL, pos_ind_val, neg_ind_val, WITNESS_RATIO, pos_digit)
-            
-    
+    val_data, val_labels, val_bag = my_functions.generate_set(valX, valY, EXPERIMENT_ID, N_POS_VAL_BAGS, N_NEG_VAL_BAGS, len_of_array, BAG_SIZE, N_INS_FIRST_LEVEL, N_INS_SECOND_LEVEL, N_INS_THIRD_LEVEL, pos_ind_val, neg_ind_val, WITNESS_RATIO, pos_digit)
+                
     ### DEFINE TEST SET ###
         
     # Generate bags and save them in dictionaries
@@ -180,7 +177,7 @@ if __name__ == '__main__':
                                         experimental_run_tf_function=False)    
         
     # Train model
-    classifier_history = classifier_model.fit_generator(generator=train_generator,
+    _ = classifier_model.fit_generator(generator=train_generator,
                                                             steps_per_epoch=None,
                                                             epochs=EPOCHS,
                                                             verbose=1,  # Verbosity mode. 0 = silent, 1 = progress bar, 2 = one line per epoch.
