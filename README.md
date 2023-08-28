@@ -18,18 +18,18 @@ Multiple instance learning (MIL) is a type of weakly supervised learning where m
 The main file contains three different experiments to choose from, with two different datasets MNIST [[1]](#1) and PCAM [[2]](#2) (to use PCAM, please download the dataset from https://github.com/basveeling/pcam and place it in a folder as pcam_data). Both experiment number and dataset to use can be specified using the defined variables at the start of the script. Moreover, there is an architecture choice for a nested or not implementation, plus the use of attention.
 
 ### 3 - Link to paper
-https://arxiv.org/abs/2111.00947
+https://ieeexplore.ieee.org/document/10068957
 
 ### 4 - How to cite our work
 The code is released free of charge as open-source software under the GPL-3.0 License. Please cite our paper if you use it in your research.
 ```
-@misc{fuster2021nested,
-      title={Nested Multiple Instance Learning with Attention Mechanisms}, 
-      author={Saul Fuster and Trygve Eftestøl and Kjersti Engan},
-      year={2021},
-      eprint={2111.00947},
-      archivePrefix={arXiv},
-      primaryClass={cs.LG}
+@inproceedings{fuster2022nested,
+  title={Nested multiple instance learning with attention mechanisms},
+  author={Fuster, Saul and Eftest{\o}l, Trygve and Engan, Kjersti},
+  booktitle={2022 21st IEEE International Conference on Machine Learning and Applications (ICMLA)},
+  pages={220--225},
+  year={2022},
+  organization={IEEE}
 }
 ```
 
